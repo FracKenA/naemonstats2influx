@@ -34,8 +34,6 @@ func main() {
 		os.Exit(2)
 	}
 
-	logOut.Printf("Tags: %s\n", tags)
-
 	fileHandle, err := os.Open(filePath)
 	if err != nil {
 		logErr.Printf("Error %s", err)
@@ -58,8 +56,6 @@ func main() {
 		strings.Trim(fileScan.Text(), ", "),
 		",",
 	)
-	logOut.Println(headers)
-	logOut.Println(metrics)
 
 	if err := fileScan.Err(); err != nil {
 		logErr.Fatal(err)
