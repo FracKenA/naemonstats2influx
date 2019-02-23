@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"strings"
 )
 
 var filePath string
@@ -29,25 +30,48 @@ func main() {
 	logOut := log.New(os.Stdout, "", 0)
 
 	if filePath == "" {
-		logErr.Fatal("No file specified!")
+		logErr.Println("No file specified!")
 		os.Exit(2)
 	}
 
 	logOut.Printf("Tags: %s\n", tags)
 
-	fileData, err := os.Open(filePath)
+	fileHandle, err := os.Open(filePath)
 	if err != nil {
-		logErr.Fatalf("Error %s", err)
+		logErr.Printf("Error %s", err)
 		os.Exit(3)
 	}
-	defer fileData.Close()
+	defer fileHandle.Close()
 
-	fileScan := bufio.NewScanner(fileData)
-	for fileScan.Scan() {
-		logOut.Println(fileScan.Text())
-	}
+	fileScan := bufio.NewScanner(fileHandle)
+	// Ti's expected that the file will consist of two lines in a CSV format.
+	// Line 1 is the headers and line 2 is the data.
+	// Starting the to read the file.
+	fileScan.Scan()
+	headers := strings.Split(
+		strings.Trim(fileScan.Text(), ", "),
+		",",
+	)
+	// Advancing the marker to the second line.
+	fileScan.Scan()
+	metrics := strings.Split(
+		strings.Trim(fileScan.Text(), ", "),
+		",",
+	)
+	logOut.Println(headers)
+	logOut.Println(metrics)
 
 	if err := fileScan.Err(); err != nil {
 		logErr.Fatal(err)
+	}
+
+	if len(headers) != len(metrics) {
+		logOut.Printf(
+			"Header number (%d) does not match metric number (%d).",
+			len(headers),
+			len(metrics),
+		)
+	} else {
+		logOut.Printf("%d headers, %d metrics", len(headers), len(metrics))
 	}
 }
