@@ -65,13 +65,11 @@ func main() {
 		logErr.Fatal(err)
 	}
 
-	if len(headers) != len(metrics) {
-		logOut.Printf(
-			"Header number (%d) does not match metric number (%d).",
-			len(headers),
-			len(metrics),
-		)
-	} else {
-		logOut.Printf("%d headers, %d metrics", len(headers), len(metrics))
+	for index, metricName := range headers {
+		if tags != "" {
+			logOut.Printf("%s,tags=%s %s=%s\n", measureName, tags, metricName, metrics[index])
+		} else {
+			logOut.Printf("%s %s=%s\n", measureName, metricName, metrics[index])
+		}
 	}
 }
