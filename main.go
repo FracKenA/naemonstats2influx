@@ -11,6 +11,7 @@ import (
 var filePath string
 var measureName string
 var tagsExtra string
+var tagsNoDefault bool
 
 func init() {
 	flag.StringVar(&filePath, "f", "", "Sets the input file.")
@@ -21,6 +22,9 @@ func init() {
 
 	flag.StringVar(&tagsExtra, "t", "", "Sets any extra tags.")
 	flag.StringVar(&tagsExtra, "tags-extra", "", "Sets any extra tags. (long option)")
+
+	flag.BoolVar(&tagsNoDefault, "n", false, "Disables the default behavior of adding the metric name to the tags.")
+	flag.BoolVar(&tagsNoDefault, "no-default-tags", false, "Disables the default behavior of adding the metric name to the tags. (long option)")
 }
 
 func main() {
@@ -62,10 +66,14 @@ func main() {
 	}
 
 	for index, metricName := range headers {
-		if tagsExtra != "" {
+		if tagsNoDefault == false && tagsExtra != "" {
 			logOut.Printf("%s,tags=%s,%s %s=%s\n", measureName, metricName, tagsExtra, metricName, metrics[index])
-		} else {
+		} else if tagsNoDefault == false && tagsExtra == "" {
 			logOut.Printf("%s,tags=%s %s=%s\n", measureName, metricName, metricName, metrics[index])
+		} else if tagsNoDefault == true && tagsExtra != "" {
+			logOut.Printf("%s,tags=%s %s=%s\n", measureName, tagsExtra, metricName, metrics[index])
+		} else {
+			logOut.Printf("%s %s=%s\n", measureName, metricName, metrics[index])
 		}
 	}
 }
