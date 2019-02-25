@@ -10,7 +10,7 @@ import (
 
 var filePath string
 var measureName string
-var tags string
+var tagsExtra string
 
 func init() {
 	flag.StringVar(&filePath, "f", "", "Sets the input file.")
@@ -19,8 +19,8 @@ func init() {
 	flag.StringVar(&measureName, "m", "naemon", "Sets the measurement name.")
 	flag.StringVar(&measureName, "measurement-name", "naemon", "Sets the measurement name. (long option)")
 
-	flag.StringVar(&tags, "t", "", "Sets any tags.")
-	flag.StringVar(&tags, "tags", "", "Sets any tags. (long option)")
+	flag.StringVar(&tagsExtra, "t", "", "Sets any extra tags.")
+	flag.StringVar(&tagsExtra, "tags-extra", "", "Sets any extra tags. (long option)")
 }
 
 func main() {
@@ -62,10 +62,10 @@ func main() {
 	}
 
 	for index, metricName := range headers {
-		if tags != "" {
-			logOut.Printf("%s,tags=%s %s=%s\n", measureName, tags, metricName, metrics[index])
+		if tagsExtra != "" {
+			logOut.Printf("%s,tags=%s,%s %s=%s\n", measureName, metricName, tagsExtra, metricName, metrics[index])
 		} else {
-			logOut.Printf("%s %s=%s\n", measureName, metricName, metrics[index])
+			logOut.Printf("%s,tags=%s %s=%s\n", measureName, metricName, metricName, metrics[index])
 		}
 	}
 }
